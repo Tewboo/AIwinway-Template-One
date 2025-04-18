@@ -22,10 +22,10 @@ export default async function AdminLayout({
 
   const sidebar: Sidebar = {
     brand: {
-      title: "ShipAny",
+      title: "AIWinWay",
       logo: {
         src: "/logo.png",
-        alt: "ShipAny",
+        alt: "AIWinWay",
       },
       url: "/admin",
     },
@@ -64,19 +64,19 @@ export default async function AdminLayout({
         },
         {
           title: "Github",
-          url: "https://github.com/shipanyai/shipany-template-one",
+          url: "https://github.com/aiwinway/aiwinway-template-one",
           target: "_blank",
           icon: "RiGithubLine",
         },
         {
           title: "Discord",
-          url: "https://discord.gg/HQNnrzjZQS",
+          url: "https://discord.gg/",
           target: "_blank",
           icon: "RiDiscordLine",
         },
         {
           title: "X",
-          url: "https://x.com/shipanyai",
+          url: "https://x.com/aiwinway",
           target: "_blank",
           icon: "RiTwitterLine",
         },

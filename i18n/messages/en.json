@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Ship Any AI SaaS Startups in hours | ShipAny",
-    "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups, Ship Fast with a variety of templates and components.",
-    "keywords": "ShipAny, AI SaaS Boilerplate, NextJS Boilerplate"
+    "title": "Build Any AI SaaS Startups in hours | AIWinWay",
+    "description": "AIWinWay is a NextJS boilerplate for building AI SaaS startups, Ship Fast with a variety of templates and components.",
+    "keywords": "AIWinWay, AI SaaS Boilerplate, NextJS Boilerplate"
   },
   "user": {
     "sign_in": "Sign In",
@@ -32,7 +32,7 @@
   },
   "my_orders": {
     "title": "My Orders",
-    "description": "orders paid with ShipAny.",
+    "description": "orders paid with AIWinWay.",
     "no_orders": "No orders found",
     "tip": "",
     "activate_order": "Activate Order",
@@ -80,7 +80,7 @@
   },
   "blog": {
     "title": "Blog",
-    "description": "News, resources, and updates about ShipAny",
+    "description": "News, resources, and updates about AIWinWay",
     "read_more_text": "Read More"
   }
 }

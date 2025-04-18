@@ -9,7 +9,7 @@ AIWINWAY SaaS Startups in hours. Thanks Adoubi for sharing this wonderful templa
 1. Clone the repository
 
 ```bash
-git clone https://github.com/Tewboo/AIWallpaper_NoPorkbun.git
+git clone https://github.com/Tewboo/AIwinway-Template-One.git
 ```
 
 2. Install dependencies

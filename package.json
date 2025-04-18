@@ -1,9 +1,9 @@
 {
-  "name": "shipany-template-one",
+  "name": "aiwinway-template-one",
   "version": "1.0.0",
   "private": true,
-  "author": "idoubi",
-  "homepage": "https://shipany.ai",
+  "author": "Jesse",
+  "homepage": "https://aiwinway.com",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
