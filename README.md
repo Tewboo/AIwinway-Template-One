@@ -1,6 +1,6 @@
 # ShipAny Template One
 
-Ship Any AI SaaS Startups in hours.
+Ship Any AI SaaS Startups in hours. Thanks Adoubi for sharing this wonderful template.
 
 ![preview](preview.png)
 
@@ -9,7 +9,7 @@ Ship Any AI SaaS Startups in hours.
 1. Clone the repository
 
 ```bash
-git clone https://github.com/shipanyai/shipany-template-one.git
+git clone https://github.com/Tewboo/AIWallpaper_NoPorkbun.git
 ```
 
 2. Install dependencies
@@ -35,7 +35,7 @@ cp .env.example .env.production
 
 - Set your theme in `app/theme.css`
 
-[shadcn-ui-theme-generator](https://zippystarter.com/tools/shadcn-ui-theme-generator)
+> Click here to set your theme: [shadcn-ui-theme-generator](https://zippystarter.com/tools/shadcn-ui-theme-generator)
 
 - Set your landing page content in `i18n/pages/landing`
 
