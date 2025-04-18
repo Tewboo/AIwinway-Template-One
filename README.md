@@ -1,6 +1,6 @@
-# ShipAny Template One
+# AIWINWAY Template One
 
-Ship Any AI SaaS Startups in hours. Thanks Adoubi for sharing this wonderful template.
+AIWINWAY SaaS Startups in hours. Thanks Adoubi for sharing this wonderful template.
 
 ![preview](preview.png)
 
@@ -40,12 +40,14 @@ cp .env.example .env.production
 - Set your landing page content in `i18n/pages/landing`
 
 ```Prompt
-参考 @落地页 这个网页的内容，帮我修改这个落地页的json，以xxxxx先xxxxx为关键词，修改文案。
+参考 @落地页(目标网页) 这个网页的内容，帮我修改这个landing落地页的json，以xxxxx，yyyyy为关键词，修改文案，优先修改英文的，如果有需要也修改中文的。
 ```
 
-- 修改主页内容的首屏木粉，可以来这里，`components\blocks\hero\index.tsx`
+- 修改主页内容的首屏内容，可以来这里，`components\blocks\hero\index.tsx`
 
 - 调试修改的时候，先注释掉暂时不需要的部分，`app\[locale]\(default)\page.tsx`
+
+> 暂时已经注释了不需要的部分
 
 ```
     <>
@@ -66,8 +68,9 @@ cp .env.example .env.production
 
 - 修改若干细节，匹配上自己项目，`i18n\pages\landing\en.json`
   - Logo
-  - 品牌名
-  - 
+    - favicon可以再layout里面添加
+    - icon直接再json里面修改
+  - 品牌名全篇修改
 
 - Set your i18n messages in `i18n/messages`
 
@@ -90,22 +93,22 @@ update terms-of-service according to landing page content @en.json with brand na
 
 - stats，数据阔以先隐藏掉
 
-- 图标选择，`https://react-icons.github.io/react-icons/icons/ri`
+- 项目内的各种页面图标参考示例，`https://react-icons.github.io/react-icons/icons/ri`
 
 - 生成组件之后，依次放入到components之后，然后放入到landing page.tsx，每一个组件都是一个单独的模块，可以做好了之后，放到需要的地方去
 
-```
-截图
-帮我生成一个这样的组件
+```Prompt
+[截图]
+帮我生成一个这样的组件，单独放到一个模块并导出，我稍后会加入到Layout
 ```
 
 - 通过api来设置ai功能，`app\api\demo\gen-image\route.ts`，这里默认就是创建route.ts
 
 - 通过debug来调试，`debug\apitest.http`，频繁使用这里进行调试
 
-- types文件夹设置保存数据的typescript的验证，比如一个数据表wallpaper，有一些字段，就要去types里面创建wallpaper.d.ts来设置严格
+- types文件夹设置保存数据的TypeScript的验证，比如一个数据表wallpaper，有一些字段，就要去types里面创建wallpaper.d.ts来设置严格验证
 
-- models里面设置数据库的功能，创建对应的名称，可以参考示例
+- Models里面设置数据库的功能，创建对应的名称，可以参考示例
 
 - Vercel不支持保存到本地图片，只能搞网络云存储
 
@@ -138,7 +141,9 @@ AUTH_SECRET = "手动生成一段随机数"
 
 - Github 登录
   - Setting - Developing Setting - Oauth app
+
 ![20250411125341](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250411125341.png)
+
 记得这里的Authorization callback URL要注意HTTP还是HTTPS
 
 ```
@@ -162,9 +167,10 @@ ADMIN_EMAILS = ""
 ### 关键词密度
 
 - 调整关键词密度
+
 ```Prompt
-帮我修改落地页内容，提升一下aiwallpaper generator 关键词的
-密度·为了有更好的 seo 效果
+帮我修改落地页内容，提升一下ai xxxxx 关键词的
+密度，为了有更好的 SEO 效果
 ```
 
 ### 站点地图
@@ -193,7 +199,7 @@ NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = ""
 
 - Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fshipanyai%2Fshipany-template-one&project-name=my-shipany-project&repository-name=my-shipany-project&redirect-url=https%3A%2F%2Fshipany.ai&demo-title=ShipAny&demo-description=Ship%20Any%20AI%20Startup%20in%20hours%2C%20not%20days&demo-url=https%3A%2F%2Fshipany.ai&demo-image=https%3A%2F%2Fpbs.twimg.com%2Fmedia%2FGgGSW3La8AAGJgU%3Fformat%3Djpg%26name%3Dlarge)
+[![Steps To Deploy with Vercel](https://vercel.com/button)]
 
 - Deploy to Cloudflare
 
@@ -216,10 +222,10 @@ npm run cf:deploy
 
 ## Community
 
-- [ShipAny](https://shipany.ai)
-- [Documentation](https://docs.shipany.ai)
-- [Discord](https://discord.gg/HQNnrzjZQS)
+- [AIWINWAY](https://aiwinway.com)
+- [Documentation](https://docs.aiwinway.com)
+- [Discord](https://discord.gg/)
 
 ## License
 
-- [ShipAny AI SaaS Boilerplate License Agreement](LICENSE)
+- [AIWINWAY AI SaaS Boilerplate License Agreement](LICENSE)
