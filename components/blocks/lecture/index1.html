@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示词工程新手训练营：与AI高效对话的艺术</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script>
+        // Tailwind Config
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef8ff',
+                            100: '#d9edff',
+                            200: '#bce0ff',
+                            300: '#8acbff',
+                            400: '#56b0ff',
+                            500: '#318bff',
+                            600: '#1a6ff7',
+                            700: '#1559e6',
+                            800: '#1748ba',
+                            900: '#193d91',
+                            950: '#142757',
+                        },
+                        secondary: {
+                            50: '#f6f6f7',
+                            100: '#e1e3e8',
+                            200: '#c3c7d1',
+                            300: '#9ea3b3',
+                            400: '#7c8298',
+                            500: '#62687f',
+                            600: '#4e5368',
+                            700: '#414555',
+                            800: '#383c47',
+                            900: '#32343d',
+                            950: '#121317',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgb(241 245 249);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgb(15 23 42);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgb(203 213 225);
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgb(51 65 85);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgb(148 163 184);
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: rgb(71 85 105);
+        }
+        
+        /* For images */
+        .img-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+        }
+        .img-container img {
+            transition: transform 0.3s ease;
+        }
+        .img-container:hover img {
+            transform: scale(1.03);
+        }
+        
+        /* Lazy load animation */
+        .lazy-load {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .lazy-loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Custom card hover */
+        .hover-card {
+            transition: all 0.3s ease;
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .dark .hover-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hero-subtitle {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 font-sans">
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed top-3 right-3 z-50 p-1.5 rounded-full bg-white dark:bg-slate-800 shadow-md hover:shadow-lg dark:shadow-slate-800/30 transition-all duration-300 hover:scale-110">
+        <span class="material-icons !text-lg text-yellow-500 dark:text-slate-300 block dark:hidden">light_mode</span>
+        <span class="material-icons !text-lg text-slate-700 dark:text-yellow-400 hidden dark:block">dark_mode</span>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-40 backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-primary-600 dark:text-primary-400 font-bold text-xl">提示词工程训练营</span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-4">
+                        <a href="#welcome" class="py-2 px-3 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">欢迎</a>
+                        <a href="#intro" class="py-2 px-3 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">介绍</a>
+                        <a href="#core" class="py-2 px-3 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">核心概念</a>
+                        <a href="#techniques" class="py-2 px-3 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">技巧</a>
+                        <a href="#practice" class="py-2 px-3 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">实践</a>
+                        <a href="#conclusion" class="py-2 px-3 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">总结</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="p-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">
+                        <span class="material-icons">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pb-3 px-4">
+            <div class="space-y-1">
+                <a href="#welcome" class="block py-2 px-3 rounded-md text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">欢迎</a>
+                <a href="#intro" class="block py-2 px-3 rounded-md text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">介绍</a>
+                <a href="#core" class="block py-2 px-3 rounded-md text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">核心概念</a>
+                <a href="#techniques" class="block py-2 px-3 rounded-md text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">技巧</a>
+                <a href="#practice" class="block py-2 px-3 rounded-md text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">实践</a>
+                <a href="#conclusion" class="block py-2 px-3 rounded-md text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">总结</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <!-- Hero Section -->
+        <section id="welcome" class="py-8 sm:py-16 lazy-load">
+            <div class="text-center">
+                <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">提示词工程新手训练营</h1>
+                <p class="text-xl sm:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">与AI高效对话的艺术</p>
+                
+                <div class="mt-10 img-container max-w-4xl mx-auto">
+                    <img src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="学习路线图" class="w-full rounded-xl shadow-lg dark:shadow-slate-800/40">
+                </div>
+                
+                <div class="mt-12 max-w-3xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-8 border border-slate-200 dark:border-slate-700">
+                    <h2 class="text-2xl font-semibold text-slate-900 dark:text-white mb-4">欢迎与导航</h2>
+                    <p class="text-slate-600 dark:text-slate-300">欢迎来到提示词工程的世界！这门课就像是你的专属向导，将带你一步步探索如何像专家一样与人工智能（AI）进行有效沟通。别担心，我们会从最基础的概念讲起，让你轻松入门，然后逐渐掌握那些让AI"听懂话"、"干对活"的实用技巧。</p>
+                    
+                    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mb-2">school</span>
+                            <h3 class="font-medium text-slate-900 dark:text-white mb-1">你将学到什么</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">提示词工程的核心概念、常用技巧和实际应用，让AI成为你学习和工作的得力助手。</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mb-2">settings</span>
+                            <h3 class="font-medium text-slate-900 dark:text-white mb-1">学习方式</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">理论与实践相结合，循序渐进地掌握与AI高效沟通的艺术，适合同步互动或异步自学。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Introduction Section -->
+        <section id="intro" class="py-12 lazy-load">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-1 bg-primary-500 dark:bg-primary-400 rounded-full mr-4"></div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">初识提示词工程</h2>
+                </div>
+                
+                <div class="space-y-10">
+                    <!-- What is a Prompt -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover-card">
+                        <div class="p-6 sm:p-8">
+                            <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">chat</span>
+                                什么是提示词？
+                            </h3>
+                            <p class="text-slate-600 dark:text-slate-300 mb-4">提示词（Prompt）就是你向人工智能发出的指令、问题或者任何形式的输入。它是你启动与AI对话、引导AI进行思考和生成内容的"钥匙"或"启动器"。</p>
+                            
+                            <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                                <div class="flex-1 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <h4 class="font-medium text-slate-900 dark:text-white mb-2">类比理解</h4>
+                                    <p class="text-sm text-slate-600 dark:text-slate-400">你可以把AI想象成一个知识渊博，但需要清晰指引才能行动的超级助手。你的提示词，就好比是给这位助手下达的"工作简报"或"任务说明书"。</p>
+                                </div>
+                                <div class="flex-1 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <h4 class="font-medium text-slate-900 dark:text-white mb-2">形式多样</h4>
+                                    <p class="text-sm text-slate-600 dark:text-slate-400">提示词可以是一个简单的词、一个直接的问题、一段详细的描述，甚至包含背景信息、具体要求和角色扮演的指令。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- What is Prompt Engineering -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover-card">
+                        <div class="p-6 sm:p-8">
+                            <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">engineering</span>
+                                什么是提示词工程？
+                            </h3>
+                            <p class="text-slate-600 dark:text-slate-300 mb-4">提示词工程（Prompt Engineering）是一门关于如何更好地设计和优化你给AI的指令（提示词）的学问，目的是为了让AI能够给出最有用、最准确、最符合你预期的回答或输出。</p>
+                            
+                            <div class="mt-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">核心理念</h4>
+                                <p class="text-slate-600 dark:text-slate-400">一个核心的原则是"输入决定输出"（Quality In, Quality Out）。你提供给AI的提示词的质量越高、越清晰、越有针对性，AI反馈给你的结果通常就会越好。</p>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center p-3 bg-primary-50 dark:bg-primary-900/30 rounded-lg border border-primary-100 dark:border-primary-800/50">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-3">tips_and_updates</span>
+                                <p class="text-sm text-primary-700 dark:text-primary-300">提示词工程往往是一个反复试验和迭代优化的过程。不要害怕调整和改进你的提示词！</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Why is Prompt Engineering Important -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover-card">
+                        <div class="p-6 sm:p-8">
+                            <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">priority_high</span>
+                                为什么提示词工程很重要？
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mt-1 mr-3">
+                                        <span class="text-primary-600 dark:text-primary-400 text-sm font-semibold">1</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-slate-900 dark:text-white mb-1">释放AI潜力</h4>
+                                        <p class="text-slate-600 dark:text-slate-300 text-sm">精心设计的提示词能够解锁AI的深层能力，让它们完成更加复杂和精细的任务。</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mt-1 mr-3">
+                                        <span class="text-primary-600 dark:text-primary-400 text-sm font-semibold">2</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-slate-900 dark:text-white mb-1">提升效率与质量</h4>
+                                        <p class="text-slate-600 dark:text-slate-300 text-sm">掌握提示词工程能让你与AI的协作更加高效，更快地获得高质量内容，减少反复尝试的时间浪费。</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mt-1 mr-3">
+                                        <span class="text-primary-600 dark:text-primary-400 text-sm font-semibold">3</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-slate-900 dark:text-white mb-1">增强控制力</h4>
+                                        <p class="text-slate-600 dark:text-slate-300 text-sm">通过学习提示词工程，你能更好地掌控AI的输出结果，指定内容的格式、语气、长度、视角等。</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mt-1 mr-3">
+                                        <span class="text-primary-600 dark:text-primary-400 text-sm font-semibold">4</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-slate-900 dark:text-white mb-1">培养未来技能</h4>
+                                        <p class="text-slate-600 dark:text-slate-300 text-sm">在AI日益融入我们生活和工作的今天，与AI有效协作已经成为一项越来越重要的能力。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2 flex items-center">
+                                    <span class="material-icons text-primary-500 dark:text-primary-400 mr-2 text-sm">psychology</span>
+                                    教育者的新角色
+                                </h4>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm">在AI时代，教育者的角色正在从知识的传授者转变为学习过程的引导者和启发者。提示词工程赋予了学习者前所未有的主体性和能动性，使他们从被动接收信息转变为知识的主动建构者。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- Core Concepts Section -->
+        <section id="core" class="py-12 lazy-load">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-1 bg-primary-500 dark:bg-primary-400 rounded-full mr-4"></div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">掌握核心概念</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <div class="rounded-full w-10 h-10 bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+                            <span class="material-icons text-primary-600 dark:text-primary-400">clear_all</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">清晰指令</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">使用明确的行动动词，避免含糊词语，聚焦核心任务，确保AI准确理解你的意图。</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <div class="rounded-full w-10 h-10 bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+                            <span class="material-icons text-primary-600 dark:text-primary-400">info</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">提供上下文</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">说明目标受众，提供关键背景信息，引用特定来源，让AI能够生成高度相关的内容。</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <div class="rounded-full w-10 h-10 bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+                            <span class="material-icons text-primary-600 dark:text-primary-400">person</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">角色扮演</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">给AI指定一个特定的角色或身份，使其回答更贴合该角色的知识水平和语言风格。</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <div class="rounded-full w-10 h-10 bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+                            <span class="material-icons text-primary-600 dark:text-primary-400">wysiwyg</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">指定格式</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">明确要求特定的输出结构、长度限制、语气和风格，减少后期整理工作。</p>
+                    </div>
+                </div>
+                
+                <!-- PST-R Framework -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">view_module</span>
+                            PST-R：提示词设计原则
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-6">为了帮助我们更有条理地设计出高效的提示词，可以借鉴PST-R这个思考框架。它包含四个核心要素：</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">P - 目的 (Purpose)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">你到底想让AI做什么？是总结信息、创作故事、分析数据还是其他任务？明确目标是第一步。</p>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">S - 空间 (Space)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">AI的"思考空间"如何？需要提供哪些上下文信息来限定它的思考范围？如何定义输出格式？</p>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">T - 时间 (Time)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">任务需要一次性完成还是多轮对话？AI是否需要按特定时间顺序思考或组织内容？</p>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">R - 角色 (Role)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">希望AI以什么样的身份或视角来回应？设定合适的角色能显著提升输出内容质量。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-primary-50 dark:bg-primary-900/30 rounded-lg border border-primary-100 dark:border-primary-800/50">
+                            <p class="text-sm text-primary-700 dark:text-primary-300">PST-R框架不仅是一个设计清单，它实际上揭示了提示词工程各种技巧之所以有效的内在结构。在编写提示词时对照这四个维度进行检查，可以系统地确保所有关键要素都得到考虑。</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- Techniques Section -->
+        <section id="techniques" class="py-12 lazy-load">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-1 bg-primary-500 dark:bg-primary-400 rounded-full mr-4"></div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">解锁AI潜能：常用技巧</h2>
+                </div>
+                
+                <!-- Step-by-Step Thinking -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-8 hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">stairs</span>
+                            逐步思考：引导AI深度推理
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300">当面对复杂问题时，引导AI"一步一步地思考"能显著提高答案的准确性和逻辑性。这种被称为"思维链"（Chain of Thought, CoT）的技巧，会引导AI模拟人类解决问题时的推理步骤。</p>
+                        
+                        <div class="mt-6 bg-slate-50 dark:bg-slate-900 p-5 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-medium text-slate-900 dark:text-white mb-3">示例：弹珠计算问题</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
+                                        <span class="material-icons text-primary-600 dark:text-primary-400 text-sm">person</span>
+                                    </div>
+                                    <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-700 dark:text-slate-300">
+                                        假设我最初有8个弹珠。我给了朋友3个，然后我又找到了4个。我现在一共有多少个弹珠？<strong>请一步一步思考。</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                        <span class="material-icons text-slate-600 dark:text-slate-400 text-sm">smart_toy</span>
+                                    </div>
+                                    <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-700 dark:text-slate-300">
+                                        <ol class="list-decimal list-inside space-y-1 ml-1">
+                                            <li>初始状态：我有8个弹珠。</li>
+                                            <li>第一个动作：给了朋友3个。</li>
+                                            <li>计算剩余数量：8 - 3 = 5个弹珠。</li>
+                                            <li>第二个动作：又找到了4个。</li>
+                                            <li>计算最终数量：5 + 4 = 9个弹珠。</li>
+                                            <li>结论：所以，我现在一共有9个弹珠。</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+                            <p>适用场景：数学应用题、逻辑谜题、复杂的因果分析、多步骤项目规划等。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Few-Shot Prompting -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-8 hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">content_copy</span>
+                            提供示例：让AI模仿学习
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300">与其用很多文字描述你想要什么，不如直接给AI看几个例子。这种方法被称为"少样本提示"（Few-Shot Prompting），利用了大型语言模型从少量示例中学习和泛化的能力。</p>
+                        
+                        <div class="mt-6 bg-slate-50 dark:bg-slate-900 p-5 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-medium text-slate-900 dark:text-white mb-3">示例：情感分类</h4>
+                            <div class="text-sm text-slate-700 dark:text-slate-300">
+                                <p class="mb-3">将以下评论分类为"积极"、"消极"或"中性"。</p>
+                                <div class="space-y-3">
+                                    <div class="flex">
+                                        <span class="font-medium mr-2">评论：</span>
+                                        <span>"这部电影简直是浪费时间。"</span>
+                                        <span class="ml-auto font-medium">情感：消极</span>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="font-medium mr-2">评论：</span>
+                                        <span>"我全程笑得停不下来！"</span>
+                                        <span class="ml-auto font-medium">情感：积极</span>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="font-medium mr-2">评论：</span>
+                                        <span>"特效很棒，但故事情节有点混乱。"</span>
+                                        <span class="ml-auto font-medium">情感：中性</span>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="font-medium mr-2">评论：</span>
+                                        <span>"我觉得这家餐厅的服务还可以。"</span>
+                                        <span class="ml-auto font-medium">情感：？</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 space-y-4">
+                            <h4 class="font-medium text-slate-900 dark:text-white">编写技巧</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p class="text-slate-700 dark:text-slate-300"><span class="font-medium">格式一致性：</span> 确保所有示例遵循相同的输入/输出格式。</p>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p class="text-slate-700 dark:text-slate-300"><span class="font-medium">示例多样性：</span> 选择能覆盖不同情况的示例，帮助AI更好地泛化。</p>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p class="text-slate-700 dark:text-slate-300"><span class="font-medium">示例顺序：</span> 模型对提示词中最后出现的示例可能更敏感。</p>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p class="text-slate-700 dark:text-slate-300"><span class="font-medium">分隔符：</span> 使用清晰的分隔符将指令、示例和输入区分开。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Multimodal Learning -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">dashboard</span>
+                            生成多模态学习对象
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300">提示词不仅能用来生成文本，还可以引导AI创造各种不同形式的学习资源，满足不同学习偏好和教学场景的需求。</p>
+                        
+                        <div class="mt-6 grid grid-cols-1 gap-4">
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <div class="flex items-center mb-2">
+                                    <span class="material-icons text-primary-500 dark:text-primary-400 mr-2 text-sm">summarize</span>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">生成文本摘要</h4>
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">用提示词让AI快速提炼冗长文章的核心内容。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "请将这篇关于'全球变暖影响'的5000字研究报告，总结成一个300字左右的关键点摘要，面向政策制定者。"
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <div class="flex items-center mb-2">
+                                    <span class="material-icons text-primary-500 dark:text-primary-400 mr-2 text-sm">code</span>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">生成代码示例</h4>
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">用提示词让AI生成特定功能的代码片段，辅助学习编程。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "请用Python编写一个函数，输入一个整数列表，返回列表中所有偶数的平均值，并添加适当的注释说明代码逻辑。"
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <div class="flex items-center mb-2">
+                                    <span class="material-icons text-primary-500 dark:text-primary-400 mr-2 text-sm">quiz</span>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">生成测验题目</h4>
+                                </div>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">教师可以利用AI快速生成用于评估学生理解程度的测验题。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "根据以上提供的关于'细胞结构'的学习材料，请生成5道单项选择题，每题包含四个选项，并明确标出正确答案和简要解释。"
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-primary-50 dark:bg-primary-900/30 rounded-lg border border-primary-100 dark:border-primary-800/50">
+                            <p class="text-sm text-primary-700 dark:text-primary-300">提示词工程是实现学习内容多样化和个性化的强大杠杆。它极大地降低了创建多样化教学内容的门槛，使得原本可能需要大量时间和专业技能才能完成的工作变得触手可及。</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- Advanced Concepts Section -->
+        <section id="advanced" class="py-12 lazy-load">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-1 bg-primary-500 dark:bg-primary-400 rounded-full mr-4"></div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">超越基础：创意与思考</h2>
+                </div>
+                
+                <!-- Knowledge Emotions -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-8 hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">psychology_alt</span>
+                            激发知识情感
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300">学习远不止是冷冰冰的知识获取，情感在其中扮演着至关重要的角色。某些特定的情感状态与学习、探索和反思行为紧密相关，它们被称为"知识情感"（Knowledge Emotions）。</p>
+                        
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">激发惊喜 (Surprise)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">惊喜源于预期之外的事物，可以要求AI提供与普遍认知相悖的"反直觉"事实。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "请告诉我5个关于古埃及金字塔建造的、最令人惊讶且有据可查的事实，这些事实可能会颠覆普通人的普遍认知。"
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">激发兴趣 (Interest)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">兴趣是持续学习的强大动力，可以让AI生成与学习者自身兴趣点联系的内容。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "假设你是一位热爱篮球的体育记者，请用生动有趣的方式，向同样喜欢篮球的学生解释物理学中的'抛物线运动'原理。"
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">激发好奇 (Curiosity)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">好奇心驱使我们探索未知，可以要求AI生成有启发性的开放性问题或谜题。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "关于'人类意识的本质'这个哲学问题，目前科学和哲学领域存在哪些主要的未解之谜？请生成3个能够引导学生进行深入探究和讨论的问题。"
+                                </div>
+                            </div>
+                            
+                            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <h4 class="font-medium text-slate-900 dark:text-white mb-2">激发敬畏 (Awe)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">敬畏感通常来自于面对宏大、壮丽或极其复杂深刻的事物，能让我们感到自身的渺小。</p>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded text-xs text-slate-700 dark:text-slate-300">
+                                    "请扮演一位诗人兼天文学家，用充满敬畏和想象力的语言，描绘从詹姆斯·韦伯太空望远镜传回的创生之柱图像所展现的宇宙景象。"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bandwidth-Immediacy Matrix -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">tune</span>
+                            带宽-即时性矩阵与提示词
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300">在线教育领域常用的"带宽-即时性矩阵"工具可以类比到提示词工程中，帮助我们根据不同的情境和需求来设计和使用提示词。</p>
+                        
+                        <div class="mt-6 bg-slate-50 dark:bg-slate-900 p-5 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-medium text-slate-900 dark:text-white mb-3">提示词复杂度/长度 (类比带宽)</h4>
+                                    <div class="space-y-3">
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm">
+                                            <span class="font-medium text-slate-800 dark:text-slate-200">低复杂度/短提示：</span>
+                                            <p class="text-slate-600 dark:text-slate-400 mt-1">简单、直接的提示词通常需要AI动用的"计算资源"较少，响应速度更快，适合需要快速获取信息的场景。</p>
+                                        </div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm">
+                                            <span class="font-medium text-slate-800 dark:text-slate-200">高复杂度/长提示：</span>
+                                            <p class="text-slate-600 dark:text-slate-400 mt-1">包含大量背景信息、多步骤指令的复杂提示词需要AI投入更多"计算资源"，适合生成详细的内容或解决复杂问题。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-slate-900 dark:text-white mb-3">交互需求 (类比即时性)</h4>
+                                    <div class="space-y-3">
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm">
+                                            <span class="font-medium text-slate-800 dark:text-slate-200">高即时性需求：</span>
+                                            <p class="text-slate-600 dark:text-slate-400 mt-1">在需要快速得到AI反馈的场景下，如实时课堂问答，更适合使用简洁直接的提示词。</p>
+                                        </div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm">
+                                            <span class="font-medium text-slate-800 dark:text-slate-200">低即时性需求：</span>
+                                            <p class="text-slate-600 dark:text-slate-400 mt-1">在允许AI有更多时间处理的场景下，如异步学习任务，可以使用更复杂、更详尽的提示词。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-primary-50 dark:bg-primary-900/30 rounded-lg border border-primary-100 dark:border-primary-800/50">
+                            <p class="text-sm text-primary-700 dark:text-primary-300">核心思想：提示词工程并非只有一种"正确"的方法，有效的提示策略需要根据具体的交互场景、预期响应以及可用资源进行灵活调整。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 img-container">
+                    <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="控制面板" class="w-full rounded-xl shadow-lg">
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Section -->
+        <section id="practice" class="py-12 lazy-load">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-1 bg-primary-500 dark:bg-primary-400 rounded-full mr-4"></div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">动手实践：轮到你来提示！</h2>
+                </div>
+                
+                <p class="text-slate-600 dark:text-slate-300 mb-8">理论学习是基础，但真正掌握提示词工程的关键在于实践。以下练习将帮助你将前面学到的概念和技巧付诸行动。</p>
+                
+                <div class="space-y-6">
+                    <!-- Exercise 1 -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mr-3">
+                                <span class="text-primary-600 dark:text-primary-400 font-semibold">1</span>
+                            </div>
+                            提升清晰度与上下文
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">针对一个你熟悉的主题，通过改进提示词的清晰度和上下文信息，来提升AI生成内容的质量。</p>
+                        
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">
+                            <ol class="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                                <li>选择一个你比较了解的话题</li>
+                                <li>编写一个模糊的初始提示词，记录AI输出</li>
+                                <li>运用"清晰指令"和"提供上下文"原则改进提示词</li>
+                                <li>再次生成内容并对比结果</li>
+                                <li>反思两次输出的差异</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <!-- Exercise 2 -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mr-3">
+                                <span class="text-primary-600 dark:text-primary-400 font-semibold">2</span>
+                            </div>
+                            体验角色扮演
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">让AI扮演不同的角色来解释同一个概念，观察输出风格和内容的变化。</p>
+                        
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">
+                            <ol class="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                                <li>挑选一个稍微复杂的概念（如"光合作用"）</li>
+                                <li>让AI不带任何角色地解释这个概念</li>
+                                <li>让AI扮演"小学科学老师"解释给8岁孩子听</li>
+                                <li>让AI扮演"领域专家"在学术会议上解释</li>
+                                <li>对比三次输出的词汇、风格、深度和例子选择上的差异</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <!-- Exercise 3 -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-3 flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mr-3">
+                                <span class="text-primary-600 dark:text-primary-400 font-semibold">3</span>
+                            </div>
+                            运用示例学习 (Few-Shot)
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm mb-4">通过提供少量示例，教会AI模仿一种特定的写作风格或遵循一种特定的输出格式。</p>
+                        
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">
+                            <ol class="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                                <li>选择一种你希望AI模仿的风格或格式</li>
+                                <li>准备2-3个高质量的输入/输出示例</li>
+                                <li>构建Few-Shot提示词，包含任务指令和示例</li>
+                                <li>评估AI生成的内容是否成功模仿了目标风格</li>
+                                <li>如需要，调整示例或指令后再次测试</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <!-- More exercises ... -->
+                </div>
+                
+                <div class="mt-12 img-container">
+                    <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="实践场景" class="w-full rounded-xl shadow-lg">
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion Section -->
+        <section id="conclusion" class="py-12 lazy-load">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-1 bg-primary-500 dark:bg-primary-400 rounded-full mr-4"></div>
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">总结与展望</h2>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-10 hover-card">
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-4">关键要点回顾</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-3 mt-1">check_circle</span>
+                                <div>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">提示词与提示词工程</h4>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">提示词是我们与AI沟通的桥梁，提示词工程是设计和优化这些指令的艺术与科学。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-3 mt-1">check_circle</span>
+                                <div>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">核心概念</h4>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">清晰指令、提供上下文、角色扮演、指定格式，以及PST-R框架（目的、空间、时间、角色）。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-3 mt-1">check_circle</span>
+                                <div>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">常用技巧</h4>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">逐步思考（Chain of Thought）、提供示例（Few-Shot Prompting）等方法能显著提升AI输出质量。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <span class="material-icons text-primary-500 dark:text-primary-400 mr-3 mt-1">check_circle</span>
+                                <div>
+                                    <h4 class="font-medium text-slate-900 dark:text-white">拓展应用</h4>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">多模态学习对象生成、知识情感激发、以及根据不同场景选择提示词复杂度。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <div class="flex items-center mb-4">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">explore</span>
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">持续学习与探索</h3>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">提示词工程是快速发展的领域，保持好奇心、不断实践、反思与迭代是提高的关键。关注伦理问题，包括AI潜在的偏见、信息准确性和数据隐私。</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover-card">
+                        <div class="flex items-center mb-4">
+                            <span class="material-icons text-primary-500 dark:text-primary-400 mr-2">handshake</span>
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">成为主动的AI协作者</h3>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm">你不再是被动接受AI输出的用户，而是能够主动引导、塑造甚至激发AI能力的协作者。将AI视为学习伙伴、研究助理和创意引擎。</p>
+                    </div>
+                </div>
+                
+                <div class="mt-12 img-container">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="未来旅程" class="w-full rounded-xl shadow-lg">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-10 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">提示词工程新手训练营</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">与AI高效对话的艺术</p>
+                </div>
+                
+                <div class="flex flex-col items-center md:items-end">
+                    <div class="flex space-x-4 mb-4">
+                        <a href="https://twitter.com/tewbooathtb" class="text-slate-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200">
+                            <span class="sr-only">Twitter</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/tewboo" class="text-slate-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">© 2025 峻菁. 保留所有权利。</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // Check system preference
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            html.classList.add('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu when clicking on a link
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Lazy loading animation
+        const lazyLoadElements = document.querySelectorAll('.lazy-load');
+        
+        const lazyLoadObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('lazy-loaded');
+                    lazyLoadObserver.unobserve(entry.target);
+                }
+            });
+        }, { rootMargin: '0px 0px -100px 0px' });
+        
+        lazyLoadElements.forEach(element => {
+            lazyLoadObserver.observe(element);
+        });
+    </script>
+</body>
+</html>

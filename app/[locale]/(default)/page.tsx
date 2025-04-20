@@ -6,11 +6,15 @@ import Feature1 from "@/components/blocks/feature1";
 import Feature2 from "@/components/blocks/feature2";
 import Feature3 from "@/components/blocks/feature3";
 import Hero from "@/components/blocks/hero";
+import Lecture from "@/components/blocks/lecture";
+import { lectureData } from "@/components/blocks/lecture/data";
 import Pricing from "@/components/blocks/pricing";
 import Showcase from "@/components/blocks/showcase";
 import Stats from "@/components/blocks/stats";
 import Testimonial from "@/components/blocks/testimonial";
 import { getLandingPage } from "@/services/page";
+import SocialConnect from "@/components/blocks/social-connect";
+
 
 export async function generateMetadata({
   params: { locale },
@@ -40,6 +44,8 @@ export default async function LandingPage({
   return (
     <>
       {page.hero && <Hero hero={page.hero} />}
+      <Lecture lecture={lectureData} /> {/* 这里是示例数据，之后你可以替换成 Claude 生成的实际内容 */}
+      <SocialConnect />
       {/* {page.branding && <Branding section={page.branding} />}
       {page.introduce && <Feature1 section={page.introduce} />}
       {page.benefit && <Feature2 section={page.benefit} />}
