@@ -4,7 +4,9 @@ AIWINWAY SaaS Startups in hours. Thanks Adoubi for sharing this wonderful templa
 
 ![preview](preview.png)
 
-## Quick Start
+## Quick Start 
+
+local repo name AIWallpaper_NoPorkbun
 
 1. Clone the repository
 
@@ -22,6 +24,12 @@ pnpm install
 
 ```bash
 pnpm dev
+```
+
+4. Remove remote Template One
+
+```bash
+git remote remove origin
 ```
 
 ## Customize
