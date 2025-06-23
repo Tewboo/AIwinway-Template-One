@@ -34,6 +34,8 @@ git remote remove origin
 
 ## Customize
 
+### 配置env
+
 - You can try jules, really awesome
 - Set your environment variables
 - 复制到开发和生产环境
@@ -44,15 +46,21 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
+### 修改theme
+
 - Set your theme in `app/theme.css`
 
 [shadcn-ui-theme-generator](https://zippystarter.com/tools/shadcn-ui-theme-generator)
+
+### 修改landing page
 
 - Set your landing page content in `i18n/pages/landing`，这里就可以修改网页对应的落地内容，都已经用json格式在landing里面设置好了。
 
 ```Prompt
 参考 @落地页(目标网页@https://aiwallpaper.shop/) 这个网页的内容，帮我修改这个landing落地页的json，以xxxxx，yyyyy为关键词，修改文案，优先修改英文的，如果有需要也修改中文的。
 ```
+
+### 修改首页内容
 
 - 修改主页内容的首屏部分，可以去这里操作，`components\blocks\hero\index.tsx`
 
@@ -76,6 +84,30 @@ cp .env.example .env.production
       {page.cta && <CTA section={page.cta} />} */}
     </>
 ```
+
+#### 修改faq
+
+```Prompt
+修改 faq，针对我的项目 ai xxxx xxxx 写一些问题。
+```
+
+#### 修改cta
+
+```Prompt
+再改一下 cta。
+```
+
+#### 适当隐藏额内容
+
+`i18n\pages\landing\en.json`
+`i18n\pages\landing\zh.json`
+
+testimonial 用户评价
+showcase 案例
+stats 数据显示
+对应的en.json，zh.json里面，"disabled": true即可
+
+### 其他页面改修
 
 - 修改若干细节，匹配上自己项目:
   - Logo => `public\logo.png`
@@ -124,6 +156,12 @@ update terms-of-service according to landing page content @en.json with brand na
 - Vercel不支持保存到本地图片，只能搞网络云存储
 
 - 配置Stripe，尝试使用测试卡stripe test card来解决，可以使用沙河
+
+### 图标库使用
+
+https://react-icons.github.io/react-icons/icons/ri/
+
+![20250623084316](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250623084316.png)
 
 ### 创建数据库
 
@@ -310,6 +348,108 @@ STRIPE_WEBHOOK_SECRET = ""
     "show_locale": true
   },
 ```
+
+### 新增业务功能
+
+#### 新增组件
+
+components 组件名称 index.tsx
+在这个空文件里面输入提示词
+
+```Prompt
+@截图
+帮我生成一个新的组件
+```
+
+LandingPage页面导入内容，然后在Hero块添加
+
+组件如果不居中，就适当调整一下
+
+#### 新增对应业务的案例展示内容
+
+components 组件名称 比如一个展示Gallery index.tsx
+
+```prompt
+@截图
+参考这个组件帮我实现一下
+```
+
+比如这里就是一个页面生成的画廊展示，那么这里就会出现一个单独的组件，还是需要引用到Hero页面，然后这里面一般也会提供示例，我们要用示例去尝试一下，看是否能够调用成功。
+接着就是放到Hero页面的时候，是不是需要传值进去呢，如果需要，就传一下比如items等，具体要查看数据结构。
+
+#### 获取套壳api的示例
+
+结合你需要用到的api套壳的对应api示例，添加到你的页面内容中：
+1，申请对应的api tokens
+2，设置env环境变量到.env.development中，稍后可以在页面上调用
+3，结合api套壳选择要用的模型，确定模型名称
+4，在套壳api平台用ui界面调试好效果
+5，参考模型给的示例，在app、api的接口下创建接口文件夹，记得下面要用route.ts文件
+6，写好请求类型
+```code
+import { respData, respErr} from "@/lib/resp";
+
+export async function POST(req: Requesst) {
+  try {
+    const { description } = await req.json();
+
+    const prompt = `generate a xxxxx with the following description: ${description}`;
+
+    return respData({
+      prompt: prompt,
+    });
+
+  } catch (e) {
+    console.log("generate xxxx failed:", e);
+    return respErr("generate xxxx failed");
+  }
+}
+```
+
+#### 调试接口apitest.http
+
+debug文件夹下面的apitest.http文件
+
+> gen xxxx
+POST {{baseUrl}}/api/demo/gen-image
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "description": "a beautiful girl running with 2 hippos
+}
+
+#### 存储图片推荐存储到云端，可以先参考图片
+
+> 最好使用云存储，不过也可以使用本的url方式，但是有些服务不能访问本地图片
+
+如果是本地url就是
+```code
+
+const url = `${process.env.NEXT_PUBLIC_WEB_URL}/${filename};
+```
+
+![20250623215631](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250623215631.png)
+
+![20250623215713](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250623215713.png)
+
+![20250623215726](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250623215726.png)
+
+#### 表单将输入框的内容传给接口
+
+找到components的文件夹，对应的组件文件夹下面，在index.tsx里面做一些连接，视频在32分钟左右查看，如果不记得了就分析下，研究下。
+
+
+
+#### 其他细节内容
+
+把api套壳代码贴过来之后，可以通过warnings.length等来判断是否有warnings，没有就通过，还可以用batch = getUuid()来获取一个随机数，其实就是去参考api 第三方的示例，然后就是`参考艾逗笔的第二个视频，有不少细节，参考下24分钟开始`，有些需要的包，自己去查看AI，然后分析是第三方的包，还是node js本地的。返回的内容直接通过参考response的响应来分析使用就行。
+
+https://www.bilibili.com/video/BV1v1KnesEbg/?spm_id_from=333.788.player.player_end_recommend&vd_source=bfcbe877ccf366715be6b9996153e788
+
+
+
+
 
 ## Deploy(TODOing)
 
