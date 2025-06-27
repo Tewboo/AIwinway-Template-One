@@ -437,9 +437,262 @@ const url = `${process.env.NEXT_PUBLIC_WEB_URL}/${filename};
 
 #### 表单将输入框的内容传给接口
 
-找到components的文件夹，对应的组件文件夹下面，在index.tsx里面做一些连接，视频在32分钟左右查看，如果不记得了就分析下，研究下。
+找到components的文件夹，对应的组件文件夹下面，在index.tsx里面做一些操作就可以把表单和api串起来发送请求，视频在32分钟左右查看，如果不记得了就分析下，研究下。
 
+很巧妙，还可以用Next_Public_web_url来作为域名把图片后缀穿起来，就可以直接本地使用了
 
+`components\generator\index.tsx`，可以在这里做调试看看示例
+
+如果需要用到数据存储则添加新表
+
+```code
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { toast } from "sonner";
+
+export default function Generator() {
+  const [description, setDescription] = useState("");
+
+  const handleGenerate = () => {
+    if (!description) {
+      toast.error("Please enter a description!");
+      return;
+    }
+
+    // Add logic to handle the description input
+    console.log("Generating with description:", description);
+    toast.success("Generating content...", { description });
+  };
+
+  return (
+    <div className="flex w-full max-w-3xl mx-auto gap-4 mb-16 -mt-16">
+      {/* Input Field */}
+      <Input
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Enter your description here"
+        className="w-full rounded-full border-2 border-purple-500/20 bg-white/5 px-6 py-6 text-lg focus-visible:outline-none"
+      />
+
+      {/* Button */}
+      <Button
+        onClick={handleGenerate}
+        className="rounded-full bg-purple-600 px-8 py-6 text-lg font-semibold text-white hover:bg-purple-700"
+      >
+        Generate
+      </Button>
+    </div>
+  );
+}
+```
+
+#### 添加新表
+
+`data\install.sql`
+
+在这里添加新表的sql后，去supabase添加，输入下面的内容
+
+```code
+CREATE TABLE wallpapers (
+    id SERIAL PRIMARY KEY,
+    uuid VARCHAR(255) UNIQUE NOT NULL,
+    user_uuid VARCHAR(255), -- 用户UUID谁生成的，不加NOT NULL，允许不登录
+    created_at timestamptz,
+    img_description TEXT,
+    img_url VARCHAR(255),
+    status VARCHAR(50),
+);
+```
+
+添加成功后，要去对数据类型进行约束
+
+`types\wallpaper.d.ts`
+
+```prompt
+转换成ts interface
+
+export interface Wallpaper {
+  uuid: string; // Unique identifier for the wallpaper
+  user_uuid?: string; // UUID of the user who generated it (optional)
+  created_at: string; // Timestamp for creation (ISO format)
+  img_description: string; // Description of the image
+  img_url: string; // URL of the image
+  status: string; // Status of the wallpaper (e.g., "active", "pending")
+}
+```
+
+然后需要添加models里面的操作表的代码
+
+#### 添加操作数据的方法
+
+`models\wallpaper.ts`
+
+```code
+import { Wallpaper } from "@/types/wallpaper";
+import { getSupabaseClient } from "./db";
+
+export async function insertWallpaper(wallpaper: Wallpaper) {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase.from("wallpapers").insert(wallpaper);
+
+  if (error) throw error;
+
+  return data;
+}
+
+export async function getWallpapers(
+  page: number = 1,
+  limit: number = 50
+): Promise<Wallpaper[] | undefined> {
+  const offset = (page - 1) * limit;
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("wallpapers")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    return undefined;
+  }
+
+  return data;
+}
+```
+
+然后要去到对应routes里面添加对应代码38分75秒左右查看，【ShipAny 开发 AI 壁纸生成器（二）｜ 实现 AI 生成壁纸业务功能】 https://www.bilibili.com/video/BV1v1KnesEbg/?share_source=copy_web&vd_source=6edb3726b410b58ae7a7550b98fd1bfc
+
+#### 关于支付
+
+stripe似乎是主流，但是对个人有要求，需要公司等情况需要解决，先把积分解决，之后再选型找到合适的支付功能接口。
+
+#### 关于积分
+
+`i18n\pages\landing\en.json`这里可以配置积分
+
+```code
+      {
+        "title": "Standard",
+        "description": "Ship Fast with your SaaS Startups.",
+        "label": "Popular",
+        "features_title": "Everything in Starter, plus",
+        "features": [
+          "200 credits, valid for 3 month",
+          "Deploy with Vercel or Cloudflare",
+          "Generation of Privacy & Terms",
+          "Google Analytics Integration",
+          "Google Search Console Integration",
+          "Discord community",
+          "Technical support for your first ship",
+          "Lifetime updates"
+        ],
+        "interval": "one-time",
+        "amount": 19900,
+        "cn_amount": 139900,
+        "currency": "USD",
+        "price": "$199",
+        "original_price": "$299",
+        "unit": "USD",
+        "is_featured": true,
+        "tip": "Pay once. Build unlimited projects!",
+        "button": {
+          "title": "Get AIWinWay",
+          "url": "/#pricing",
+          "icon": "RiFlashlightFill"
+        },
+        "product_id": "standard",
+        "product_name": "AIWinWay Boilerplate Standard",
+        "credits": 200,
+        "valid_months": 3
+      },
+```
+
+需要去到对应的api接口功能的route.ts里面，首先获取user_uuid，然后判断登录情况，不成功就返回respErr的内容，比如“user not login”，如果登录就去获取积分getUserCredits，然后判断积分的使用，设置一下消耗积分，比如cost_credits = 3，然后写一下if语句，判断credits.left_credits < cost_credits，结合世界情况，就可以给出报错，或者继续往后走就行。最后如果成功了呀记得写上消费记录decreaseCredits来用user_uuid去，还要记得去credits.ts里面去定义一下，如何扣除积分，
+
+这里面需要添加CreditsTransType和CreditsAmount做一些修改和定义就行
+```code
+export enum CreditsTransType {
+  NewUser = "new_user", // initial credits for new user
+  OrderPay = "order_pay", // user pay for credits
+  SystemAdd = "system_add", // system add credits
+  Ping = "ping", // cost for ping api
+}
+
+export enum CreditsAmount {
+  NewUserGet = 10,
+  PingCost = 1,
+}
+```
+
+![20250627162146](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250627162146.png)
+
+![20250627162116](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250627162116.png)
+
+![20250627161904](https://cdn.jsdelivr.net/gh/jun-jing/MultiPlat_PicGallery@main/MultiPlat/PicGallery/20250627161904.png)
+
+#### 后台管理
+
+`app\[locale]\(admin)\admin\路由文件夹\page.tsx`
+
+1，先读取数据
+2，定义表头字段
+3，然后通过Table定义好的模版渲染就行
+4，记得要在layout.tsx下面添加一下访问路径，参考/admin/posts写就行
+参考下面的代码
+
+```code
+import { TableColumn } from "@/types/blocks/table";
+import TableSlot from "@/components/dashboard/slots/table";
+import { Table as TableSlotType } from "@/types/slots/table";
+import { getUsers } from "@/models/user";
+import moment from "moment";
+
+export default async function () {
+  const users = await getUsers(1, 50);
+
+  const columns: TableColumn[] = [
+    { name: "uuid", title: "UUID" },
+    { name: "email", title: "Email" },
+    { name: "nickname", title: "Name" },
+    {
+      name: "avatar_url",
+      title: "Avatar",
+      callback: (row) => (
+        <img src={row.avatar_url} className="w-10 h-10 rounded-full" />
+      ),
+    },
+    {
+      name: "created_at",
+      title: "Created At",
+      callback: (row) => moment(row.created_at).format("YYYY-MM-DD HH:mm:ss"),
+    },
+  ];
+
+  const table: TableSlotType = {
+    title: "All Users",
+    columns,
+    data: users,
+  };
+
+  return <TableSlot {...table} />;
+}
+```
+
+还可以通过callback去显示图片，添加a标签还能点击了
+
+还可以设计编辑的后台功能，然后还可以控制上线功能，用编辑控制要不要显示。Promise和Partial好像是全部和部分，比如Partial就可以用来更新
+
+还可以参考
+`app\[locale]\(admin)\admin\posts\[uuid]\edit\page.tsx`
+`app\[locale]\(admin)\admin\路由文件夹\[uuid]\edit\page.tsx`
+
+来设计一下编辑功能，也需要参考第三集内容，有所有细节内容19分40秒左右开始
+【ShipAny 开发 AI 壁纸生成器（三）｜实现支付购买 / 用户积分管理 / 后台壁纸管理功能】 https://www.bilibili.com/video/BV1VUKnepEoY/?share_source=copy_web&vd_source=6edb3726b410b58ae7a7550b98fd1bfc
 
 #### 其他细节内容
 
@@ -447,9 +700,11 @@ const url = `${process.env.NEXT_PUBLIC_WEB_URL}/${filename};
 
 https://www.bilibili.com/video/BV1v1KnesEbg/?spm_id_from=333.788.player.player_end_recommend&vd_source=bfcbe877ccf366715be6b9996153e788
 
+`getIsoTimestr`可以用封装好的方计时
 
+用户没有登录的话，也要做好前端判断，比如判断是if(!user)就可以判断用户是否存在，然后可以把setShowModel这个方法把登录框弹出来去让用户登录。
 
-
+还可以去apitest.http里面填写上面的apikey，这样既可以把这个系统的生成的api key给别人用，然后可以直接通过接口访问得到效果，就可以绕过登录环节了，当然宿主要扣几分的。
 
 ## Deploy(TODOing)
 

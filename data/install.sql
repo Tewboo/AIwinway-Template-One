@@ -77,3 +77,13 @@ CREATE TABLE posts (
     author_avatar_url VARCHAR(255),
     locale VARCHAR(50)
 );
+
+CREATE TABLE wallpapers (
+    id SERIAL PRIMARY KEY,
+    uuid VARCHAR(255) UNIQUE NOT NULL,
+    user_uuid VARCHAR(255), -- 用户UUID谁生成的，不加NOT NULL，允许不登录
+    created_at timestamptz,
+    img_description TEXT,
+    img_url VARCHAR(255),
+    status VARCHAR(50),
+);

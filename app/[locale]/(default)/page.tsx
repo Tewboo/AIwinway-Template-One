@@ -14,6 +14,7 @@ import Stats from "@/components/blocks/stats";
 import Testimonial from "@/components/blocks/testimonial";
 import { getLandingPage } from "@/services/page";
 import SocialConnect from "@/components/blocks/social-connect";
+import Generator from "@/components/generator";
 
 
 export async function generateMetadata({
@@ -44,6 +45,7 @@ export default async function LandingPage({
   return (
     <>
       {page.hero && <Hero hero={page.hero} />}
+      <Generator />
       <Lecture lecture={lectureData} /> {/* 这里是示例数据，之后你可以替换成 Claude 生成的实际内容 */}
       <SocialConnect />
       {/* {page.branding && <Branding section={page.branding} />}
